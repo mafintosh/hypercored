@@ -1,6 +1,6 @@
 {
   "name": "hypercored",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "A daemon that can download and share multiple hypercores and hyperdrives",
   "main": "index.js",
   "dependencies": {
