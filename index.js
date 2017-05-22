@@ -49,6 +49,14 @@ ar.on('changes', function (feed) {
 console.log('Watching %s for a list of active feeds', path.join(cwd, 'feeds'))
 
 wss.createServer({server: server}, onwebsocket)
+server.on('request', function (req, res) {
+  res.setHeader('Content-Type', 'application/json')
+  res.end(JSON.stringify({
+    name: 'hypercored',
+    version: require('./package').version
+  }))
+})
+
 swarm(ar).on('listening', function () {
   var self = this
 
