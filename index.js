@@ -1,5 +1,7 @@
 #!/usr/bin/env node
 
+process.title = 'hypercored'
+
 var wss = require('websocket-stream')
 var archiver = require('hypercore-archiver')
 var swarm = require('hypercore-archiver/swarm')
