@@ -30,6 +30,10 @@ if (unencryptedWebsockets) {
   argv.websockets = true
 }
 
+ar.on('sync', function (feed) {
+  console.log('Fully synced', feed.key.toString('hex'))
+})
+
 ar.on('add', function (feed) {
   console.log('Adding', feed.key.toString('hex'))
 })
