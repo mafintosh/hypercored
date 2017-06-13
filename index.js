@@ -74,10 +74,10 @@ swarm(ar).on('listening', function () {
 readFile(path.join(cwd, 'feeds'), function (file) {
   var feeds = file.toString().trim().split('\n')
     .filter(function (line) {
-      return /^(dat:)?(\/\/)?[0-9a-f]{64}$/i.test(line.trim())
+      return /^(dat:)?(\/\/)?[0-9a-f]{64}(\/.*)?$/i.test(line.trim())
     })
     .map(function (line) {
-      return line.trim().split('//').pop()
+      return line.trim().split('//').pop().split('/')[0]
     })
 
   ar.list(function (err, keys) {
