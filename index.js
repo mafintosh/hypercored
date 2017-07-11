@@ -2,6 +2,7 @@
 
 process.title = 'hypercored'
 
+var datDns = require('dat-dns')()
 var wss = require('websocket-stream')
 var archiver = require('hypercore-archiver')
 var swarm = require('hypercore-archiver/swarm')
@@ -71,27 +72,28 @@ swarm(ar).on('listening', function () {
   }
 })
 
+function resolveName(line) {
+  return datDns.resolveName(line)
+    .catch(() => Promise.resolve(false))
+}
+
 readFile(path.join(cwd, 'feeds'), function (file) {
-  var feeds = file.toString().trim().split('\n')
-    .filter(function (line) {
-      return /^(dat:)?(\/\/)?[0-9a-f]{64}(\/.*)?$/i.test(line.trim())
+  Promise.all(file.toString().trim().split('\n').map(resolveName))
+    .then((lines) => lines.filter(Boolean))
+    .then((feeds) => {
+      ar.list(function (err, keys) {
+        if (err || !ar.changes.writable) return
+
+        var i = 0
+
+        for (i = 0; i < keys.length; i++) {
+          if (feeds.indexOf(keys[i].toString('hex')) === -1) ar.remove(keys[i])
+        }
+        for (i = 0; i < feeds.length; i++) {
+          ar.add(feeds[i])
+        }
+      })
     })
-    .map(function (line) {
-      return line.trim().split('//').pop().split('/')[0]
-    })
-
-  ar.list(function (err, keys) {
-    if (err || !ar.changes.writable) return
-
-    var i = 0
-
-    for (i = 0; i < keys.length; i++) {
-      if (feeds.indexOf(keys[i].toString('hex')) === -1) ar.remove(keys[i])
-    }
-    for (i = 0; i < feeds.length; i++) {
-      ar.add(feeds[i])
-    }
-  })
 })
 
 function onwebsocket (stream) {
