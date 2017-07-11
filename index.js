@@ -72,28 +72,37 @@ swarm(ar).on('listening', function () {
   }
 })
 
-function resolveName(line) {
-  return datDns.resolveName(line)
-    .catch(() => Promise.resolve(false))
+function resolveAll (links, cb) {
+  var keys = []
+  var missing = links.length
+
+  if (!missing) return cb(null, [])
+
+  for (var i = 0; i < links.length; i++) {
+    datDns.resolveName(links[i], function (_, key) {
+      keys.push(key)
+      if (!--missing) cb(null, keys.filter(Boolean))
+    })
+  }
 }
 
 readFile(path.join(cwd, 'feeds'), function (file) {
-  Promise.all(file.toString().trim().split('\n').map(resolveName))
-    .then((lines) => lines.filter(Boolean))
-    .then((feeds) => {
-      ar.list(function (err, keys) {
-        if (err || !ar.changes.writable) return
+  resolveAll(file.toString().trim().split('\n'), function (err, feeds) {
+    if (err) return
 
-        var i = 0
+    ar.list(function (err, keys) {
+      if (err || !ar.changes.writable) return
 
-        for (i = 0; i < keys.length; i++) {
-          if (feeds.indexOf(keys[i].toString('hex')) === -1) ar.remove(keys[i])
-        }
-        for (i = 0; i < feeds.length; i++) {
-          ar.add(feeds[i])
-        }
-      })
+      var i = 0
+
+      for (i = 0; i < keys.length; i++) {
+        if (feeds.indexOf(keys[i].toString('hex')) === -1) ar.remove(keys[i])
+      }
+      for (i = 0; i < feeds.length; i++) {
+        ar.add(feeds[i])
+      }
     })
+  })
 })
 
 function onwebsocket (stream) {
