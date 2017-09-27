@@ -24,7 +24,8 @@ if (argv.help) {
     'Usage: hypercored [key?] [options]\n\n' +
     '  --cwd         [folder to run in]\n' +
     '  --websockets  [share over websockets as well]\n' +
-    '  --port        [explicit websocket port]\n'
+    '  --port        [explicit websocket port]\n' +
+    '  --no-swarm    [disable swarming]\n'
   )
   process.exit(0)
 }
@@ -60,17 +61,17 @@ server.on('request', function (req, res) {
   }))
 })
 
-swarm(ar).on('listening', function () {
-  var self = this
+if (argv.swarm !== false) {
+  swarm(ar).on('listening', function () {
+    console.log('Swarm listening on port %d', this.address().port)
+  })
+}
 
-  if (argv.websockets) server.listen(port, onlisten)
-  else onlisten()
-
-  function onlisten () {
-    console.log('Swarm listening on port %d', self.address().port)
-    if (argv.websockets) console.log('WebSocket server listening on port %d', server.address().port)
-  }
-})
+if (argv.websockets === true) {
+  server.listen(port, function () {
+    console.log('WebSocket server listening on port %d', server.address().port)
+  })
+}
 
 function resolveAll (links, cb) {
   var keys = []

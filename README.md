@@ -17,7 +17,12 @@ hypercored
 For more info run
 
 ```
-hypercored --help
+Usage: hypercored [key?] [options]
+
+    --cwd         [folder to run in]
+    --websockets  [share over websockets as well]
+    --port        [explicit websocket port]
+    --no-swarm    [disable swarming]
 ```
 
 ## License
