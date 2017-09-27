@@ -25,7 +25,7 @@ if (argv.help) {
     '  --cwd         [folder to run in]\n' +
     '  --websockets  [share over websockets as well]\n' +
     '  --port        [explicit websocket port]\n' +
-    '  --no-swarm    [disable swarming]'
+    '  --no-swarm    [disable swarming]\n'
   )
   process.exit(0)
 }
@@ -61,13 +61,17 @@ server.on('request', function (req, res) {
   }))
 })
 
-if (argv.swarm != false) swarm(ar).on('listening', function () {
-  console.log('Swarm listening on port %d', this.address().port)
-})
+if (argv.swarm !== false) {
+  swarm(ar).on('listening', function () {
+    console.log('Swarm listening on port %d', this.address().port)
+  })
+}
 
-if (argv.websockets) server.listen(port, function () {
-  console.log('WebSocket server listening on port %d', server.address().port)
-})
+if (argv.websockets === true) {
+  server.listen(port, function () {
+    console.log('WebSocket server listening on port %d', server.address().port)
+  })
+}
 
 function resolveAll (links, cb) {
   var keys = []
