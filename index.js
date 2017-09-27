@@ -62,7 +62,7 @@ server.on('request', function (req, res) {
 })
 
 if (argv.swarm !== false) {
-  swarm(ar).on('listening', function () {
+  swarm(ar, {live: true}).on('listening', function () {
     console.log('Swarm listening on port %d', this.address().port)
   })
 }
@@ -107,5 +107,5 @@ readFile(path.join(cwd, 'feeds'), function (file) {
 })
 
 function onwebsocket (stream) {
-  pump(stream, ar.replicate({encrypt: !unencryptedWebsockets}), stream)
+  pump(stream, ar.replicate({live: true, encrypt: !unencryptedWebsockets}), stream)
 }
