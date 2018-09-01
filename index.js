@@ -80,6 +80,7 @@ function resolveAll (links, cb) {
   if (!missing) return cb(null, [])
 
   for (var i = 0; i < links.length; i++) {
+    if (links[i].startsWith('#')) continue
     datDns.resolveName(links[i], function (_, key) {
       keys.push(key)
       if (!--missing) cb(null, keys.filter(Boolean))
